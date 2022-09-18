@@ -13,7 +13,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 class SystemUIHook : IXposedHookLoadPackage {
 
     private val PACKAGE_NAME = "com.android.systemui"
-    private val TAG = "Moto-systemui-hook-"
+    private val TAG = "Moto-hook-systemui-"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
 

@@ -10,7 +10,8 @@ class PluginEntry : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         listOf(
             SystemUIHook(),
-//            FreeFormHook()
+//            FreeFormHook(),
+            LauncherHook(),
         ).forEach {
             it.handleLoadPackage(lpparam)
         }

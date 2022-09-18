@@ -2,5 +2,7 @@
 <resources>
     <string-array name="xposed_scope">
         <item>com.android.systemui</item>
+        <item>com.motorola.freeform</item>
+        <item>com.motorola.launcher3</item>
     </string-array>
 </resources>
