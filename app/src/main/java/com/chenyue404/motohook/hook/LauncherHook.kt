@@ -1,9 +1,11 @@
 package com.chenyue404.motohook.hook
 
 import android.graphics.Color
+import android.view.View
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
+import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -38,6 +40,24 @@ class LauncherHook : IXposedHookLoadPackage {
 //                    val colorStr = String.format("#%06X", (0xFFFFFF and colorInt))
 //                    log("colorStr=$colorStr")
                     param.args[0] = Color.TRANSPARENT
+                    View.GONE
+                }
+            }
+        )
+
+        findAndHookMethod(
+            "com.android.launcher3.config.FeatureFlags.BooleanFlag", classLoader,
+            "get",
+            object : XC_MethodHook() {
+                override fun beforeHookedMethod(param: MethodHookParam) {
+//                    log("com.android.launcher3.config.FeatureFlags.BooleanFlag#get")
+                    val key = XposedHelpers.findField(param.thisObject.javaClass, "key")
+                        .get(param.thisObject) as String
+                    val value = XposedHelpers.getBooleanField(param.thisObject, "key")
+                    log("key=$key, value=$value")
+                    if (key == "ENABLE_OVERVIEW_SHARE") {
+                        param.result = true
+                    }
                 }
             }
         )

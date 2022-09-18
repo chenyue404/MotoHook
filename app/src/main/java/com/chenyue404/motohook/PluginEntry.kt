@@ -1,5 +1,7 @@
-package com.chenyue404.motohook.hook
+package com.chenyue404.motohook
 
+import com.chenyue404.motohook.hook.LauncherHook
+import com.chenyue404.motohook.hook.SystemUIHook
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
