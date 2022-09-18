@@ -9,7 +9,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 class PluginEntry : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         listOf(
-            SystemUIHook()
+            SystemUIHook(),
+//            FreeFormHook()
         ).forEach {
             it.handleLoadPackage(lpparam)
         }
