@@ -9,7 +9,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 class PluginEntry : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         listOf(
-            BatteryHook()
+            SystemUIHook()
         ).forEach {
             it.handleLoadPackage(lpparam)
         }
