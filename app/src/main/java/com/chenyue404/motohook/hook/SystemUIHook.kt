@@ -1,5 +1,10 @@
 package com.chenyue404.motohook.hook
 
+import android.app.AndroidAppHelper
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -26,18 +31,21 @@ class SystemUIHook : IXposedHookLoadPackage {
 
         log("")
 
-        //隐藏电池图标
+        //隐藏电池图标，充电时显示
         findAndHookMethod(
             "com.android.systemui.BatteryMeterView", classLoader,
-            "scaleBatteryMeterViews",
+            "onBatteryLevelChanged",
+            Int::class.java,
+            Boolean::class.java,
+            Boolean::class.java,
             object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam) {
-                    log("com.android.systemui.BatteryMeterView#scaleBatteryMeterViews")
+                    log("com.android.systemui.BatteryMeterView#onBatteryLevelChanged")
+                    val args = param.args
                     val mBatteryIconView =
                         XposedHelpers.findField(param.thisObject.javaClass, "mBatteryIconView")
                             .get(param.thisObject) as ImageView
-                    log("获取mBatteryIconView")
-                    mBatteryIconView.isVisible = false
+                    mBatteryIconView.isVisible = args[1] as Boolean
                 }
             }
         )
@@ -66,6 +74,23 @@ class SystemUIHook : IXposedHookLoadPackage {
                                 return true
                             }
                         })
+                }
+            })
+
+        //自定义广播接收器打开单手模式
+        findAndHookMethod("com.android.wm.shell.onehanded.OneHandedController", classLoader,
+            "registerSettingObservers",
+            Int::class.java,
+            object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    log("com.android.wm.shell.onehanded.OneHandedController")
+                    AndroidAppHelper.currentApplication()
+                        .registerReceiver(object : BroadcastReceiver() {
+                            override fun onReceive(context: Context?, intent: Intent?) {
+                                log("收到单手广播")
+                                XposedHelpers.callMethod(param.thisObject, "startOneHanded")
+                            }
+                        }, IntentFilter("com.chenyue404.motohook.onehanded"))
                 }
             })
     }
