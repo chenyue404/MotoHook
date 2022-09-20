@@ -35,12 +35,11 @@ class LauncherHook : IXposedHookLoadPackage {
             Int::class.java,
             object : XC_MethodHook() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
-//                    log("com.android.launcher3.views.ScrimView#setBackgroundColor")
+                    log("com.android.launcher3.views.ScrimView#setBackgroundColor")
 //                    val colorInt = param.args[0] as Int
 //                    val colorStr = String.format("#%06X", (0xFFFFFF and colorInt))
 //                    log("colorStr=$colorStr")
                     param.args[0] = Color.TRANSPARENT
-                    View.GONE
                 }
             }
         )
@@ -53,8 +52,8 @@ class LauncherHook : IXposedHookLoadPackage {
 //                    log("com.android.launcher3.config.FeatureFlags.BooleanFlag#get")
                     val key = XposedHelpers.findField(param.thisObject.javaClass, "key")
                         .get(param.thisObject) as String
-                    val value = XposedHelpers.getBooleanField(param.thisObject, "key")
-                    log("key=$key, value=$value")
+//                    val value = XposedHelpers.getBooleanField(param.thisObject, "key")
+//                    log("key=$key, value=$value")
                     if (key == "ENABLE_OVERVIEW_SHARE") {
                         param.result = true
                     }
