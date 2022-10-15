@@ -1,5 +1,6 @@
 package com.chenyue404.motohook
 
+import com.chenyue404.motohook.hook.AssistantHook
 import com.chenyue404.motohook.hook.LauncherHook
 import com.chenyue404.motohook.hook.SystemUIHook
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -14,6 +15,7 @@ class PluginEntry : IXposedHookLoadPackage {
             SystemUIHook(),
 //            FreeFormHook(),
             LauncherHook(),
+            AssistantHook(),
         ).forEach {
             it.handleLoadPackage(lpparam)
         }
