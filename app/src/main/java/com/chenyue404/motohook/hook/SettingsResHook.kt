@@ -1,5 +1,6 @@
 package com.chenyue404.motohook.hook
 
+import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.IXposedHookInitPackageResources
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.callbacks.XC_InitPackageResources
@@ -22,7 +23,9 @@ class SettingsResHook : IXposedHookInitPackageResources {
         log("")
 
         // 去除设置头部的建议
-        resparam.res.setReplacement(packageName, "bool", "config_use_legacy_suggestion", false)
+        if (PluginEntry.pref?.getBoolean("key_settings_hide_header_suggestion", false) == true) {
+            resparam.res.setReplacement(packageName, "bool", "config_use_legacy_suggestion", false)
+        }
     }
 
     private fun log(str: String) {

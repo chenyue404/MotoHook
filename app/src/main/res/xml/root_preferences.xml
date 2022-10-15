@@ -1,0 +1,60 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="设置">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_settings_hide_header_suggestion"
+            app:title="去除头部的建议" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="SystemUi">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_SystemUi_hide_battery_icon_when_not_charging"
+            app:title="不充电时隐藏电池图标" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_SystemUi_long_press_recent_is_menu"
+            app:title="长按最近任务按钮打开菜单" />
+
+        <SwitchPreference
+            app:enableCopying="true"
+            app:iconSpaceReserved="false"
+            app:key="@string/key_SystemUi_receive_broadcast_open_one_hand_mode"
+            app:summary="收到action为com.chenyue404.motohook.onehanded的广播时，打开单手模式"
+            app:title="收到广播打开单手模式" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="Launcher">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_Launcher_recent_tasks_transparent_bg"
+            app:title="最近任务背景设置透明" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_Launcher_show_share_screen_shot_btn"
+            app:title="显示截图分享按钮" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="语音助手">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_assistant_use_custom_directive"
+            app:title="使用自定义指令" />
+    </PreferenceCategory>
+</PreferenceScreen>

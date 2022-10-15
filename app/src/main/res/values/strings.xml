@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MotoHook</string>
+
+    <string name="key_settings_hide_header_suggestion">key_settings_hide_header_suggestion</string>
+    <string name="key_SystemUi_hide_battery_icon_when_not_charging">key_SystemUi_hide_battery_icon_when_not_charging</string>
+    <string name="key_SystemUi_long_press_recent_is_menu">key_SystemUi_long_press_recent_is_menu</string>
+    <string name="key_SystemUi_receive_broadcast_open_one_hand_mode">key_SystemUi_receive_broadcast_open_one_hand_mode</string>
+    <string name="key_Launcher_recent_tasks_transparent_bg">key_Launcher_recent_tasks_transparent_bg</string>
+    <string name="key_Launcher_show_share_screen_shot_btn">key_Launcher_show_share_screen_shot_btn</string>
+    <string name="key_assistant_use_custom_directive">key_assistant_use_custom_directive</string>
 </resources>

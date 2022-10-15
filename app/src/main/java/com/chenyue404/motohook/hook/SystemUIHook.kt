@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
+import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -31,68 +32,86 @@ class SystemUIHook : IXposedHookLoadPackage {
 
         log("")
 
-        //隐藏电池图标，充电时显示
-        findAndHookMethod(
-            "com.android.systemui.BatteryMeterView", classLoader,
-            "onBatteryLevelChanged",
-            Int::class.java,
-            Boolean::class.java,
-            Boolean::class.java,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    log("com.android.systemui.BatteryMeterView#onBatteryLevelChanged")
-                    val args = param.args
-                    val mBatteryIconView =
-                        XposedHelpers.findField(param.thisObject.javaClass, "mBatteryIconView")
-                            .get(param.thisObject) as ImageView
-                    mBatteryIconView.isVisible = args[1] as Boolean
+        if (PluginEntry.pref?.getBoolean(
+                "key_SystemUi_hide_battery_icon_when_not_charging", false
+            ) == true
+        ) {
+            //隐藏电池图标，充电时显示
+            findAndHookMethod(
+                "com.android.systemui.BatteryMeterView", classLoader,
+                "onBatteryLevelChanged",
+                Int::class.java,
+                Boolean::class.java,
+                Boolean::class.java,
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        log("com.android.systemui.BatteryMeterView#onBatteryLevelChanged")
+                        val args = param.args
+                        val mBatteryIconView =
+                            XposedHelpers.findField(param.thisObject.javaClass, "mBatteryIconView")
+                                .get(param.thisObject) as ImageView
+                        mBatteryIconView.isVisible = args[1] as Boolean
+                    }
                 }
-            }
-        )
+            )
+        }
 
         //长按最近任务按钮打开菜单
-        findAndHookMethod("com.android.systemui.navigationbar.NavigationBar",
-            classLoader,
-            "updateScreenPinningGestures",
-            object : XC_MethodReplacement() {
-                override fun replaceHookedMethod(param: MethodHookParam) {
-                    log("com.android.systemui.navigationbar.NavigationBar#updateScreenPinningGestures")
-                    val mNavigationBarView =
-                        XposedHelpers.findField(param.thisObject.javaClass, "mNavigationBarView")
-                            .get(param.thisObject)
-                    log("获取mNavigationBarView")
-                    val recentButton =
-                        XposedHelpers.callMethod(mNavigationBarView, "getRecentsButton")
-                    log("获取recentButton")
-                    XposedHelpers.callMethod(
-                        recentButton,
-                        "setOnLongClickListener",
-                        object : View.OnLongClickListener {
-                            override fun onLongClick(v: View): Boolean {
-                                log("recentButton长按")
-                                Runtime.getRuntime().exec("input keyevent 82")
-                                return true
-                            }
-                        })
-                }
-            })
+        if (PluginEntry.pref?.getBoolean(
+                "key_SystemUi_long_press_recent_is_menu", false
+            ) == true
+        ) {
+            findAndHookMethod("com.android.systemui.navigationbar.NavigationBar",
+                classLoader,
+                "updateScreenPinningGestures",
+                object : XC_MethodReplacement() {
+                    override fun replaceHookedMethod(param: MethodHookParam) {
+                        log("com.android.systemui.navigationbar.NavigationBar#updateScreenPinningGestures")
+                        val mNavigationBarView =
+                            XposedHelpers.findField(
+                                param.thisObject.javaClass,
+                                "mNavigationBarView"
+                            )
+                                .get(param.thisObject)
+                        log("获取mNavigationBarView")
+                        val recentButton =
+                            XposedHelpers.callMethod(mNavigationBarView, "getRecentsButton")
+                        log("获取recentButton")
+                        XposedHelpers.callMethod(
+                            recentButton,
+                            "setOnLongClickListener",
+                            object : View.OnLongClickListener {
+                                override fun onLongClick(v: View): Boolean {
+                                    log("recentButton长按")
+                                    Runtime.getRuntime().exec("input keyevent 82")
+                                    return true
+                                }
+                            })
+                    }
+                })
+        }
 
         //自定义广播接收器打开单手模式
-        findAndHookMethod("com.android.wm.shell.onehanded.OneHandedController", classLoader,
-            "registerSettingObservers",
-            Int::class.java,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    log("com.android.wm.shell.onehanded.OneHandedController")
-                    AndroidAppHelper.currentApplication()
-                        .registerReceiver(object : BroadcastReceiver() {
-                            override fun onReceive(context: Context?, intent: Intent?) {
-                                log("收到单手广播")
-                                XposedHelpers.callMethod(param.thisObject, "startOneHanded")
-                            }
-                        }, IntentFilter("com.chenyue404.motohook.onehanded"))
-                }
-            })
+        if (PluginEntry.pref?.getBoolean(
+                "key_SystemUi_receive_broadcast_open_one_hand_mode", false
+            ) == true
+        ) {
+            findAndHookMethod("com.android.wm.shell.onehanded.OneHandedController", classLoader,
+                "registerSettingObservers",
+                Int::class.java,
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        log("com.android.wm.shell.onehanded.OneHandedController")
+                        AndroidAppHelper.currentApplication()
+                            .registerReceiver(object : BroadcastReceiver() {
+                                override fun onReceive(context: Context?, intent: Intent?) {
+                                    log("收到单手广播")
+                                    XposedHelpers.callMethod(param.thisObject, "startOneHanded")
+                                }
+                            }, IntentFilter("com.chenyue404.motohook.onehanded"))
+                    }
+                })
+        }
     }
 
     private fun log(str: String) {

@@ -59,7 +59,20 @@ class AssistantHook : IXposedHookLoadPackage {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     log("defpackage.is#onResults")
                     val bundle = param.args.first() as Bundle
-                    log(bundle.toString())
+//                    log(bundle.toString())
+
+//                    val resources = AndroidAppHelper.currentApplication()
+//                        .createPackageContext(
+//                            BuildConfig.APPLICATION_ID,
+//                            Context.CONTEXT_IGNORE_SECURITY
+//                        ).resources
+//                    val key_settings_hide_header_suggestion =
+//                        resources.getString(R.string.key_settings_hide_header_suggestion)
+//                    log("key_settings_hide_header_suggestion=$key_settings_hide_header_suggestion")
+//
+//                    val value_settings_hide_header_suggestion =
+//                        PluginEntry.pref?.getBoolean(key_settings_hide_header_suggestion, false)
+//                    log("value_settings_hide_header_suggestion=$value_settings_hide_header_suggestion")
 
                     val getStr = XposedHelpers.callMethod(param.thisObject, "M1", bundle) as String?
                     log(getStr ?: "未解析到")

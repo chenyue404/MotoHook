@@ -1,7 +1,7 @@
 package com.chenyue404.motohook.hook
 
 import android.graphics.Color
-import android.view.View
+import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -29,37 +29,45 @@ class LauncherHook : IXposedHookLoadPackage {
         log("")
 
         // 最近任务背景设置透明
-        findAndHookMethod(
-            "com.android.launcher3.views.ScrimView", classLoader,
-            "setBackgroundColor",
-            Int::class.java,
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    log("com.android.launcher3.views.ScrimView#setBackgroundColor")
+        if (PluginEntry.pref?.getBoolean(
+                "key_Launcher_recent_tasks_transparent_bg", false
+            ) == true
+        ) {
+            findAndHookMethod("com.android.launcher3.views.ScrimView",
+                classLoader,
+                "setBackgroundColor",
+                Int::class.java,
+                object : XC_MethodHook() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        log("com.android.launcher3.views.ScrimView#setBackgroundColor")
 //                    val colorInt = param.args[0] as Int
 //                    val colorStr = String.format("#%06X", (0xFFFFFF and colorInt))
 //                    log("colorStr=$colorStr")
-                    param.args[0] = Color.TRANSPARENT
-                }
-            }
-        )
+                        param.args[0] = Color.TRANSPARENT
+                    }
+                })
+        }
 
-        findAndHookMethod(
-            "com.android.launcher3.config.FeatureFlags.BooleanFlag", classLoader,
-            "get",
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
+        if (PluginEntry.pref?.getBoolean(
+                "key_Launcher_show_share_screen_shot_btn", false
+            ) == true
+        ) {
+            findAndHookMethod("com.android.launcher3.config.FeatureFlags.BooleanFlag",
+                classLoader,
+                "get",
+                object : XC_MethodHook() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
 //                    log("com.android.launcher3.config.FeatureFlags.BooleanFlag#get")
-                    val key = XposedHelpers.findField(param.thisObject.javaClass, "key")
-                        .get(param.thisObject) as String
+                        val key = XposedHelpers.findField(param.thisObject.javaClass, "key")
+                            .get(param.thisObject) as String
 //                    val value = XposedHelpers.getBooleanField(param.thisObject, "key")
 //                    log("key=$key, value=$value")
-                    if (key == "ENABLE_OVERVIEW_SHARE") {
-                        param.result = true
+                        if (key == "ENABLE_OVERVIEW_SHARE") {
+                            param.result = true
+                        }
                     }
-                }
-            }
-        )
+                })
+        }
     }
 
     private fun log(str: String) {
