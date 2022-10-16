@@ -57,4 +57,14 @@
             app:key="@string/key_assistant_use_custom_directive"
             app:title="使用自定义指令" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="语音唤醒">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="@string/key_leVoiceST_can_weak_up_by_le"
+            app:title="允许使用小乐小乐唤醒" />
+    </PreferenceCategory>
 </PreferenceScreen>

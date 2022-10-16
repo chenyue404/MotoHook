@@ -8,4 +8,5 @@
     <string name="key_Launcher_recent_tasks_transparent_bg">key_Launcher_recent_tasks_transparent_bg</string>
     <string name="key_Launcher_show_share_screen_shot_btn">key_Launcher_show_share_screen_shot_btn</string>
     <string name="key_assistant_use_custom_directive">key_assistant_use_custom_directive</string>
+    <string name="key_leVoiceST_can_weak_up_by_le">key_leVoiceST_can_weak_up_by_le</string>
 </resources>

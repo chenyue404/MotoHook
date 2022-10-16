@@ -5,5 +5,6 @@
         <item>com.motorola.launcher3</item>
         <item>com.android.settings</item>
         <item>com.lenovo.menu_assistant</item>
+        <item>com.lenovo.levoice.trigger</item>
     </string-array>
 </resources>

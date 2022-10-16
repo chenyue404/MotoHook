@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.chenyue404.motohook.hook.AssistantHook
 import com.chenyue404.motohook.hook.LauncherHook
 import com.chenyue404.motohook.hook.SystemUIHook
+import com.chenyue404.motohook.hook.VoiceSTHook
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XSharedPreferences
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -28,6 +29,7 @@ class PluginEntry : IXposedHookLoadPackage {
 //            FreeFormHook(),
             LauncherHook(),
             AssistantHook(),
+            VoiceSTHook(),
         ).forEach {
             it.handleLoadPackage(lpparam)
         }
