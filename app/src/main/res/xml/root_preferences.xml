@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="设置">
 
@@ -39,12 +40,20 @@
     <PreferenceCategory app:title="语音助手">
 
         <SwitchPreference
+            app:enableCopying="true"
             app:key="@string/key_assistant_use_custom_directive"
+            app:summary="如果匹配，会发出action为com.chenyue404.motohook.assistant.custom.command的广播，数据字段为text"
             app:title="使用自定义指令" />
 
         <Preference
             app:enableCopying="true"
-            app:summary="am start -a com.lenovo.levoice.action.TRIGGER_SVA可唤起语音助手" />
+            app:summary="am start -a com.lenovo.levoice.action.TRIGGER_SVA可唤起语音助手"
+            app:title="设置自定义指令">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.chenyue404.motohook.ui.CustomVoiceCommandActivity"
+                android:targetPackage="com.chenyue404.motohook" />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="语音唤醒">
@@ -53,4 +62,20 @@
             app:key="@string/key_leVoiceST_can_weak_up_by_le"
             app:title="允许使用小乐小乐唤醒" />
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="项目地址">
+        <Preference
+            app:enableCopying="true"
+            app:summary="https://github.com/chenyue404/MotoHook">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/chenyue404/MotoHook" />
+        </Preference>
+    </PreferenceCategory>
+
+    <Preference />
+    <Preference />
+    <Preference />
+    <Preference />
+    <Preference />
 </PreferenceScreen>

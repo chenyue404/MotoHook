@@ -1,15 +1,12 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.MotoHook" parent="android:Theme.DeviceDefault">
-        <item name="preferenceStyle">@style/MyPreferenceStyle</item>
-        <item name="preferenceCategoryStyle">@style/MyPreferenceCategoryStyle</item>
+        <item name="preferenceTheme">@style/MyPreferenceTheme</item>
     </style>
 
-    <style name="MyPreferenceStyle" parent="Preference">
+    <style name="MyPreferenceTheme">
         <item name="iconSpaceReserved">false</item>
     </style>
 
-    <style name="MyPreferenceCategoryStyle" parent="Preference.Category">
-        <item name="iconSpaceReserved">false</item>
-    </style>
+    <style name="dialogTheme" parent="@style/Theme.AppCompat.Dialog.Alert"></style>
 </resources>
