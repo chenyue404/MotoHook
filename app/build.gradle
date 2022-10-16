@@ -45,6 +45,12 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "MotoHook_${defaultConfig.versionName}_${defaultConfig.versionCode}_${variant.buildType.name}.apk"
+        }
+    }
 }
 
 dependencies {
