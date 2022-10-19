@@ -35,6 +35,11 @@
         <SwitchPreference
             app:key="@string/key_Launcher_show_share_screen_shot_btn"
             app:title="显示截图分享按钮" />
+
+        <SwitchPreference
+            app:dependency="@string/key_freeform_receive_broadcast_open"
+            app:key="@string/key_Launcher_long_press_open_freeform"
+            app:title="长按icon打开小窗" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="语音助手">

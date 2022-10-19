@@ -1,11 +1,14 @@
 package com.chenyue404.motohook.hook
 
+import android.app.AndroidAppHelper
+import android.content.ComponentName
+import android.content.Intent
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import com.chenyue404.motohook.PluginEntry
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -39,7 +42,7 @@ class LauncherHook : IXposedHookLoadPackage {
                 Int::class.java,
                 object : XC_MethodHook() {
                     override fun beforeHookedMethod(param: MethodHookParam) {
-                        log("com.android.launcher3.views.ScrimView#setBackgroundColor")
+//                        log("com.android.launcher3.views.ScrimView#setBackgroundColor")
 //                    val colorInt = param.args[0] as Int
 //                    val colorStr = String.format("#%06X", (0xFFFFFF and colorInt))
 //                    log("colorStr=$colorStr")
@@ -67,6 +70,42 @@ class LauncherHook : IXposedHookLoadPackage {
                         }
                     }
                 })
+        }
+
+        if (PluginEntry.pref?.getBoolean("key_Launcher_long_press_open_freeform", false) == true) {
+            findAndHookMethod(
+                "com.android.quickstep.views.TaskView", classLoader,
+                "lambda\$setIcon\$6\$TaskView",
+                View::class.java,
+                object : XC_MethodReplacement() {
+                    override fun replaceHookedMethod(param: MethodHookParam): Any {
+                        log("com.android.quickstep.views.TaskView#lambda\$setIcon\$6\$TaskView")
+
+                        val workspaceItemInfo =
+                            XposedHelpers.callMethod(param.thisObject, "getItemInfo")
+                        val componentName = XposedHelpers.callMethod(
+                            workspaceItemInfo,
+                            "getTargetComponent"
+                        ) as ComponentName
+                        val pkg = componentName.packageName
+
+                        log("pkg=$pkg")
+
+                        val recentsView =
+                            XposedHelpers.callMethod(param.thisObject, "getRecentsView")
+                        XposedHelpers.callMethod(recentsView, "finishRecentsAnimation", false, null)
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            AndroidAppHelper.currentApplication().sendBroadcast(
+                                Intent("com.chenyue404.motohook.freeform")
+                                    .putExtra("package", pkg)
+                            )
+                        }, 300)
+
+                        return true
+                    }
+                }
+            )
         }
     }
 
