@@ -63,6 +63,14 @@
             app:title="允许使用小乐小乐唤醒" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="自由小窗">
+
+        <SwitchPreference
+            app:key="@string/key_freeform_receive_broadcast_open"
+            app:summary="收到action为com.chenyue404.motohook.freeform的广播，小窗打开应用。包名通过package传递。"
+            app:title="收到广播打开小窗" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="项目地址">
         <Preference
             app:enableCopying="true"

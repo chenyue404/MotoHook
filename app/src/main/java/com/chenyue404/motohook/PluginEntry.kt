@@ -1,10 +1,7 @@
 package com.chenyue404.motohook
 
 import android.content.SharedPreferences
-import com.chenyue404.motohook.hook.AssistantHook
-import com.chenyue404.motohook.hook.LauncherHook
-import com.chenyue404.motohook.hook.SystemUIHook
-import com.chenyue404.motohook.hook.VoiceSTHook
+import com.chenyue404.motohook.hook.*
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XSharedPreferences
 import de.robv.android.xposed.callbacks.XC_LoadPackage
@@ -26,7 +23,7 @@ class PluginEntry : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         listOf(
             SystemUIHook(),
-//            FreeFormHook(),
+            FreeFormHook(),
             LauncherHook(),
             AssistantHook(),
             VoiceSTHook(),

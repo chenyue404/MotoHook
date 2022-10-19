@@ -5,6 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Handler
+import android.os.Looper
+import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
@@ -33,68 +36,71 @@ class FreeFormHook : IXposedHookLoadPackage {
 
         var receiver: BroadcastReceiver? = null
 
-        findAndHookMethod(
-            Application::class.java,
-            "onCreate",
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    log("Application onCreate after")
+        if (PluginEntry.pref?.getBoolean("key_freeform_receive_broadcast_open", false) == true) {
+            findAndHookMethod(
+                Application::class.java,
+                "onCreate",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        log("Application onCreate after")
 
-                    if (receiver == null) {
-                        receiver = object : BroadcastReceiver() {
-                            override fun onReceive(context: Context, intent: Intent) {
-                                val packageName = intent.extras?.getString("package")
-                                log(packageName ?: return)
+                        if (receiver == null) {
+                            receiver = object : BroadcastReceiver() {
+                                override fun onReceive(context: Context, intent: Intent) {
+                                    val packageName = intent.extras?.getString("package")
+                                    log(packageName ?: return)
 
-//                                val clazz_b =
-//                                    XposedHelpers.findClassIfExists("b.d.a.j.c.b", classLoader)
-//                                if (clazz_b == null) {
-//                                    log("clazz_b is null")
-//                                    return
-//                                }
-//
-//                                val class_a = XposedHelpers.getStaticObjectField(clazz_b, "a")
-//                                if (class_a == null) {
-//                                    log("class_a is null")
-//                                    return
-//                                }
-//
-//                                XposedHelpers.callMethod(
-//                                    class_a,
-//                                    "a",
-//                                    packageName
-//                                )
+                                    val clazz_cb =
+                                        XposedHelpers.findClassIfExists("b.d.a.j.c.b", classLoader)
+                                    if (clazz_cb == null) {
+                                        log("clazz_b is null")
+                                        return
+                                    }
 
-                                val clazz_c =
-                                    XposedHelpers.findClassIfExists("b.d.a.j.b.c", classLoader)
-                                if (clazz_c == null) {
-                                    log("clazz_b is null")
-                                    return
+                                    val class_ca = XposedHelpers.getStaticObjectField(clazz_cb, "a")
+                                    if (class_ca == null) {
+                                        log("class_a is null")
+                                        return
+                                    }
+                                    XposedHelpers.callMethod(
+                                        class_ca,
+                                        "a",
+                                        packageName
+                                    )
+
+                                    val clazz_bc =
+                                        XposedHelpers.findClassIfExists("b.d.a.j.b.c", classLoader)
+                                    if (clazz_bc == null) {
+                                        log("clazz_b is null")
+                                        return
+                                    }
+
+                                    val class_ba = XposedHelpers.getStaticObjectField(clazz_bc, "a")
+                                    if (class_ba == null) {
+                                        log("class_a is null")
+                                        return
+                                    }
+
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        XposedHelpers.callMethod(
+                                            class_ba,
+                                            "c",
+                                            packageName
+                                        )
+                                    }, 300)
                                 }
-
-                                val class_a = XposedHelpers.getStaticObjectField(clazz_c, "a")
-                                if (class_a == null) {
-                                    log("class_a is null")
-                                    return
-                                }
-
-                                XposedHelpers.callMethod(
-                                    class_a,
-                                    "c",
-                                    packageName
-                                )
                             }
                         }
-                    }
 
-                    (param.thisObject as Application).applicationContext
-                        .registerReceiver(
-                            receiver,
-                            IntentFilter("com.chenyue404.motohook.freeform")
-                        )
+                        (param.thisObject as Application).applicationContext
+                            .registerReceiver(
+                                receiver,
+                                IntentFilter("com.chenyue404.motohook.freeform")
+                            )
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     private fun log(str: String) {
