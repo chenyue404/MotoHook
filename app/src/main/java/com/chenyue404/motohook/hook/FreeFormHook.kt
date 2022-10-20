@@ -5,13 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Handler
-import android.os.Looper
 import com.chenyue404.motohook.PluginEntry
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.XC_MethodHook
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
@@ -33,6 +28,20 @@ class FreeFormHook : IXposedHookLoadPackage {
         }
 
         log("")
+
+
+        if (false) {
+            findAndHookMethod(
+                "b.c.a.a.a", classLoader,
+                "s",
+                Int::class.java,
+                object : XC_MethodReplacement() {
+                    override fun replaceHookedMethod(p0: MethodHookParam?): Any {
+                        return true
+                    }
+                }
+            )
+        }
 
         var receiver: BroadcastReceiver? = null
 
@@ -81,13 +90,13 @@ class FreeFormHook : IXposedHookLoadPackage {
                                         return
                                     }
 
-                                    Handler(Looper.getMainLooper()).postDelayed({
+//                                    Handler(Looper.getMainLooper()).postDelayed({
                                         XposedHelpers.callMethod(
                                             class_ba,
                                             "c",
                                             packageName
                                         )
-                                    }, 300)
+//                                    }, 300)
                                 }
                             }
                         }
