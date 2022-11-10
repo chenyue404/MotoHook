@@ -33,7 +33,8 @@ class AssistantHook : IXposedHookLoadPackage {
         log("")
 
         if (PluginEntry.pref?.getBoolean("key_assistant_use_custom_directive", false) == true) {
-            findAndHookMethod("is", classLoader,
+            findAndHookMethod(
+                "a50", classLoader,
                 "onResults",
                 Bundle::class.java,
                 object : XC_MethodHook() {
@@ -43,7 +44,7 @@ class AssistantHook : IXposedHookLoadPackage {
 //                    log(bundle.toString())
 
                         val actionStr =
-                            XposedHelpers.callMethod(param.thisObject, "M1", bundle) as String?
+                            XposedHelpers.callMethod(param.thisObject, "N1", bundle) as String?
 
                         val matchCustomCommand =
                             actionStr?.let {
