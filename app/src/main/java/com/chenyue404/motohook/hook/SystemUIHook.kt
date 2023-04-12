@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -32,28 +33,42 @@ class SystemUIHook : IXposedHookLoadPackage {
 
         log("")
 
+        val isAndroid13 = Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2
+
         if (PluginEntry.pref?.getBoolean(
                 "key_SystemUi_hide_battery_icon_when_not_charging", false
             ) == true
         ) {
             //隐藏电池图标，充电时显示
-            findAndHookMethod(
-                "com.android.systemui.BatteryMeterView", classLoader,
-                "onBatteryLevelChanged",
-                Int::class.java,
-                Boolean::class.java,
-                Boolean::class.java,
-                object : XC_MethodHook() {
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        log("com.android.systemui.BatteryMeterView#onBatteryLevelChanged")
-                        val args = param.args
-                        val mBatteryIconView =
-                            XposedHelpers.findField(param.thisObject.javaClass, "mBatteryIconView")
-                                .get(param.thisObject) as ImageView
-                        mBatteryIconView.isVisible = args[1] as Boolean
-                    }
+            object : XC_MethodHook() {
+                override fun afterHookedMethod(param: MethodHookParam) {
+                    log("com.android.systemui.BatteryMeterView#onBatteryLevelChanged")
+                    val args = param.args
+                    val mBatteryIconView =
+                        XposedHelpers.findField(param.thisObject.javaClass, "mBatteryIconView")
+                            .get(param.thisObject) as ImageView
+                    mBatteryIconView.isVisible = args[1] as Boolean
                 }
-            )
+            }.let {
+                if (isAndroid13) {
+                    findAndHookMethod(
+                        "com.android.systemui.battery.BatteryMeterView", classLoader,
+                        "onBatteryLevelChanged",
+                        Int::class.java,
+                        Boolean::class.java,
+                        it
+                    )
+                } else {
+                    findAndHookMethod(
+                        "com.android.systemui.BatteryMeterView", classLoader,
+                        "onBatteryLevelChanged",
+                        Int::class.java,
+                        Boolean::class.java,
+                        Boolean::class.java,
+                        it
+                    )
+                }
+            }
         }
 
         //长按最近任务按钮打开菜单
@@ -70,9 +85,8 @@ class SystemUIHook : IXposedHookLoadPackage {
                         val mNavigationBarView =
                             XposedHelpers.findField(
                                 param.thisObject.javaClass,
-                                "mNavigationBarView"
-                            )
-                                .get(param.thisObject)
+                                if (isAndroid13) "mView" else "mNavigationBarView"
+                            ).get(param.thisObject)
                         log("获取mNavigationBarView")
                         val recentButton =
                             XposedHelpers.callMethod(mNavigationBarView, "getRecentsButton")
