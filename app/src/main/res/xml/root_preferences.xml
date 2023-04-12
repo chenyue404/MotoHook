@@ -72,7 +72,7 @@
 
         <SwitchPreference
             app:key="@string/key_freeform_receive_broadcast_open"
-            app:summary="收到action为com.chenyue404.motohook.freeform的广播，小窗打开应用。包名通过package传递。"
+            app:summary="收到action为com.chenyue404.motohook.freeform的广播，小窗打开应用。包名通过package传递，bubble为true则显示为气泡。气泡仅支持Android13"
             app:title="收到广播打开小窗" />
     </PreferenceCategory>
 

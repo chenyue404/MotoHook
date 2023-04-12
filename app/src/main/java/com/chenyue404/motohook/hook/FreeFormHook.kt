@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
@@ -28,7 +29,7 @@ class FreeFormHook : IXposedHookLoadPackage {
         }
 
         log("")
-
+        val isAndroid13 = Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2
 
         if (false) {
             findAndHookMethod(
@@ -59,8 +60,27 @@ class FreeFormHook : IXposedHookLoadPackage {
                                     val packageName = intent.extras?.getString("package")
                                     log(packageName ?: return)
 
+                                    if (isAndroid13) {
+                                        val showBubble =
+                                            intent.extras?.getBoolean("bubble") ?: false
+                                        val clazz_i = XposedHelpers.findClass("h3.i", classLoader)
+                                        if (clazz_i == null) {
+                                            log("clazz_i is null")
+                                            return
+                                        }
+                                        val i =
+                                            XposedHelpers.callStaticMethod(clazz_i, "C", context)
+                                        if (showBubble) {
+                                            XposedHelpers.callMethod(i, "I", packageName)
+                                            return
+                                        }
+                                    }
+
                                     val clazz_cb =
-                                        XposedHelpers.findClassIfExists("b.d.a.j.c.b", classLoader)
+                                        XposedHelpers.findClassIfExists(
+                                            if (isAndroid13) "b3.b.a" else "b.d.a.j.c.b",
+                                            classLoader
+                                        )
                                     if (clazz_cb == null) {
                                         log("clazz_b is null")
                                         return
@@ -78,24 +98,27 @@ class FreeFormHook : IXposedHookLoadPackage {
                                     )
 
                                     val clazz_bc =
-                                        XposedHelpers.findClassIfExists("b.d.a.j.b.c", classLoader)
+                                        XposedHelpers.findClassIfExists(
+                                            if (isAndroid13) "b3.a.c" else "b.d.a.j.b.c",
+                                            classLoader
+                                        )
                                     if (clazz_bc == null) {
-                                        log("clazz_b is null")
+                                        log("clazz_bc is null")
                                         return
                                     }
 
                                     val class_ba = XposedHelpers.getStaticObjectField(clazz_bc, "a")
                                     if (class_ba == null) {
-                                        log("class_a is null")
+                                        log("class_ba is null")
                                         return
                                     }
 
 //                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        XposedHelpers.callMethod(
-                                            class_ba,
-                                            "c",
-                                            packageName
-                                        )
+                                    XposedHelpers.callMethod(
+                                        class_ba,
+                                        if (isAndroid13) "n" else "c",
+                                        packageName
+                                    )
 //                                    }, 300)
                                 }
                             }
