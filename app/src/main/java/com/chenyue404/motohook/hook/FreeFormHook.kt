@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
@@ -29,7 +28,6 @@ class FreeFormHook : IXposedHookLoadPackage {
         }
 
         log("")
-        val isAndroid13 = Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2
 
         if (false) {
             findAndHookMethod(
@@ -60,7 +58,7 @@ class FreeFormHook : IXposedHookLoadPackage {
                                     val packageName = intent.extras?.getString("package")
                                     log(packageName ?: return)
 
-                                    if (isAndroid13) {
+                                    if (PluginEntry.isAndroid13) {
                                         val showBubble =
                                             intent.extras?.getBoolean("bubble") ?: false
                                         val clazz_i = XposedHelpers.findClass("h3.i", classLoader)
@@ -78,7 +76,7 @@ class FreeFormHook : IXposedHookLoadPackage {
 
                                     val clazz_cb =
                                         XposedHelpers.findClassIfExists(
-                                            if (isAndroid13) "b3.b.a" else "b.d.a.j.c.b",
+                                            if (PluginEntry.isAndroid13) "b3.b.a" else "b.d.a.j.c.b",
                                             classLoader
                                         )
                                     if (clazz_cb == null) {
@@ -99,7 +97,7 @@ class FreeFormHook : IXposedHookLoadPackage {
 
                                     val clazz_bc =
                                         XposedHelpers.findClassIfExists(
-                                            if (isAndroid13) "b3.a.c" else "b.d.a.j.b.c",
+                                            if (PluginEntry.isAndroid13) "b3.a.c" else "b.d.a.j.b.c",
                                             classLoader
                                         )
                                     if (clazz_bc == null) {
@@ -116,7 +114,7 @@ class FreeFormHook : IXposedHookLoadPackage {
 //                                    Handler(Looper.getMainLooper()).postDelayed({
                                     XposedHelpers.callMethod(
                                         class_ba,
-                                        if (isAndroid13) "n" else "c",
+                                        if (PluginEntry.isAndroid13) "n" else "c",
                                         packageName
                                     )
 //                                    }, 300)

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.isVisible
@@ -33,8 +32,6 @@ class SystemUIHook : IXposedHookLoadPackage {
 
         log("")
 
-        val isAndroid13 = Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2
-
         if (PluginEntry.pref?.getBoolean(
                 "key_SystemUi_hide_battery_icon_when_not_charging", false
             ) == true
@@ -50,7 +47,7 @@ class SystemUIHook : IXposedHookLoadPackage {
                     mBatteryIconView.isVisible = args[1] as Boolean
                 }
             }.let {
-                if (isAndroid13) {
+                if (PluginEntry.isAndroid13) {
                     findAndHookMethod(
                         "com.android.systemui.battery.BatteryMeterView", classLoader,
                         "onBatteryLevelChanged",
@@ -85,7 +82,7 @@ class SystemUIHook : IXposedHookLoadPackage {
                         val mNavigationBarView =
                             XposedHelpers.findField(
                                 param.thisObject.javaClass,
-                                if (isAndroid13) "mView" else "mNavigationBarView"
+                                if (PluginEntry.isAndroid13) "mView" else "mNavigationBarView"
                             ).get(param.thisObject)
                         log("获取mNavigationBarView")
                         val recentButton =

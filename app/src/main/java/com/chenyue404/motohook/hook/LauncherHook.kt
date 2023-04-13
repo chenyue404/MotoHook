@@ -4,12 +4,14 @@ import android.app.AndroidAppHelper
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.Button
 import com.chenyue404.motohook.PluginEntry
 import de.robv.android.xposed.*
-import de.robv.android.xposed.XposedHelpers.findAndHookMethod
+import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
@@ -51,7 +53,8 @@ class LauncherHook : IXposedHookLoadPackage {
                 })
         }
 
-        if (PluginEntry.pref?.getBoolean(
+        if (!PluginEntry.isAndroid13 &&
+            PluginEntry.pref?.getBoolean(
                 "key_Launcher_show_share_screen_shot_btn", false
             ) == true
         ) {
@@ -72,7 +75,9 @@ class LauncherHook : IXposedHookLoadPackage {
                 })
         }
 
-        if (PluginEntry.pref?.getBoolean("key_Launcher_long_press_open_freeform", false) == true) {
+        if (!PluginEntry.isAndroid13 &&
+            PluginEntry.pref?.getBoolean("key_Launcher_long_press_open_freeform", false) == true
+        ) {
             findAndHookMethod(
                 "com.android.quickstep.views.TaskView", classLoader,
                 "lambda\$setIcon\$6\$TaskView",
@@ -103,6 +108,42 @@ class LauncherHook : IXposedHookLoadPackage {
                         }, 300)
 
                         return true
+                    }
+                }
+            )
+        }
+
+        if (PluginEntry.isAndroid13
+            && PluginEntry.pref?.getBoolean("key_Launcher_replace_split_to_share", false) == true
+        ) {
+            findAndHookMethod(
+                "com.android.quickstep.views.OverviewActionsView",
+                classLoader,
+                "setSplitButtonVisible",
+                Boolean::class.java,
+                object : XC_MethodHook() {
+                    override fun beforeHookedMethod(param: MethodHookParam) {
+                        param.args[0] = true
+                        (getObjectField(param.thisObject, "mSplitButton") as Button)
+                            .setText("分享截图")
+                    }
+                }
+            )
+            findAndHookMethod(
+                "com.android.quickstep.TaskOverlayFactory.TaskOverlay",
+                classLoader,
+                "enterSplitSelect",
+                object : XC_MethodReplacement() {
+                    override fun replaceHookedMethod(param: MethodHookParam): Any? {
+                        log("拆分->分享截图")
+                        val mImageApi = getObjectField(param.thisObject, "mImageApi")
+                        callMethod(
+                            mImageApi,
+                            "startShareActivity",
+                            arrayOf(Rect::class.java),
+                            null
+                        )
+                        return null
                     }
                 }
             )

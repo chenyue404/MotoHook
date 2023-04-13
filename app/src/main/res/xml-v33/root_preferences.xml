@@ -33,8 +33,8 @@
             app:title="最近任务背景设置透明" />
 
         <SwitchPreference
-            app:key="@string/key_Launcher_show_share_screen_shot_btn"
-            app:title="显示截图分享按钮" />
+            app:key="@string/key_Launcher_replace_split_to_share"
+            app:title="显示分屏按钮并替换成“分享截图”" />
 
         <SwitchPreference
             app:dependency="@string/key_freeform_receive_broadcast_open"
@@ -72,7 +72,7 @@
 
         <SwitchPreference
             app:key="@string/key_freeform_receive_broadcast_open"
-            app:summary="收到action为com.chenyue404.motohook.freeform的广播，小窗打开应用。包名通过package传递。"
+            app:summary="收到action为com.chenyue404.motohook.freeform的广播，小窗打开应用。包名通过package传递，bubble为true则显示为气泡。"
             app:title="收到广播打开小窗" />
     </PreferenceCategory>
 
