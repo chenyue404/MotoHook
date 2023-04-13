@@ -5,8 +5,6 @@ import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.Button
 import com.chenyue404.motohook.PluginEntry
@@ -75,42 +73,64 @@ class LauncherHook : IXposedHookLoadPackage {
                 })
         }
 
-        if (!PluginEntry.isAndroid13 &&
-            PluginEntry.pref?.getBoolean("key_Launcher_long_press_open_freeform", false) == true
-        ) {
-            findAndHookMethod(
-                "com.android.quickstep.views.TaskView", classLoader,
-                "lambda\$setIcon\$6\$TaskView",
-                View::class.java,
-                object : XC_MethodReplacement() {
-                    override fun replaceHookedMethod(param: MethodHookParam): Any {
-                        log("com.android.quickstep.views.TaskView#lambda\$setIcon\$6\$TaskView")
+        if (PluginEntry.pref?.getBoolean("key_Launcher_long_press_open_freeform", false) == true) {
 
-                        val workspaceItemInfo =
-                            XposedHelpers.callMethod(param.thisObject, "getItemInfo")
-                        val componentName = XposedHelpers.callMethod(
-                            workspaceItemInfo,
-                            "getTargetComponent"
-                        ) as ComponentName
-                        val pkg = componentName.packageName
+            val showAsBubble = PluginEntry.isAndroid13 &&
+                    PluginEntry.pref?.getBoolean(
+                        "key_Launcher_long_press_open_freeform_as_bubble",
+                        false
+                    ) == true
 
-                        log("pkg=$pkg")
+            object : XC_MethodReplacement() {
+                override fun replaceHookedMethod(param: MethodHookParam): Any {
+                    val workspaceItemInfo =
+                        callMethod(param.thisObject, "getItemInfo")
+                    val componentName = callMethod(
+                        workspaceItemInfo,
+                        "getTargetComponent"
+                    ) as ComponentName
+                    val pkg = componentName.packageName
 
-                        val recentsView =
-                            XposedHelpers.callMethod(param.thisObject, "getRecentsView")
-                        XposedHelpers.callMethod(recentsView, "finishRecentsAnimation", false, null)
+                    log("pkg=$pkg")
 
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            AndroidAppHelper.currentApplication().sendBroadcast(
-                                Intent("com.chenyue404.motohook.freeform")
-                                    .putExtra("package", pkg)
-                            )
-                        }, 300)
+                    val recentsView =
+                        callMethod(param.thisObject, "getRecentsView")
+                    callMethod(recentsView, "finishRecentsAnimation", false, Runnable {
+                        AndroidAppHelper.currentApplication().sendBroadcast(
+                            Intent("com.chenyue404.motohook.freeform")
+                                .putExtra("package", pkg)
+                                .putExtra("bubble", showAsBubble)
+                        )
+                    })
 
-                        return true
-                    }
+//                    Handler(Looper.getMainLooper()).postDelayed({
+//                        AndroidAppHelper.currentApplication().sendBroadcast(
+//                            Intent("com.chenyue404.motohook.freeform")
+//                                .putExtra("package", pkg)
+//                        )
+//                    }, 300)
+
+                    return true
                 }
-            )
+            }.let {
+                if (PluginEntry.isAndroid13) {
+                    findAndHookMethod(
+                        "com.android.quickstep.views.TaskView",
+                        classLoader,
+                        "lambda\$setIcon\$8\$com-android-quickstep-views-TaskView",
+                        findClass("com.android.quickstep.views.IconView", classLoader),
+                        View::class.java,
+                        it
+                    )
+                } else {
+                    findAndHookMethod(
+                        "com.android.quickstep.views.TaskView", classLoader,
+                        "lambda\$setIcon\$6\$TaskView",
+                        View::class.java,
+                        it
+                    )
+                }
+            }
         }
 
         if (PluginEntry.isAndroid13
