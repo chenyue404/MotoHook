@@ -7,10 +7,11 @@ import com.chenyue404.motohook.BuildConfig
 import com.chenyue404.motohook.PluginEntry
 import com.chenyue404.motohook.ui.CustomVoiceCommandActivity
 import de.robv.android.xposed.*
-import de.robv.android.xposed.XposedHelpers.findAndHookMethod
+import de.robv.android.xposed.XposedHelpers.*
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import org.json.JSONArray
 import org.json.JSONException
+import java.io.File
 import java.util.regex.Pattern
 
 /**
@@ -32,6 +33,12 @@ class AssistantHook : IXposedHookLoadPackage {
 
         log("")
 
+        val clazz_PackageParser = findClass("android.content.pm.PackageParser", classLoader)
+        val apkPath = File(AndroidAppHelper.currentApplicationInfo().sourceDir)
+        val packageLite = callStaticMethod(clazz_PackageParser, "parsePackageLite", apkPath, 0)
+        val versionCode = getIntField(packageLite, "versionCode")
+        log("versionCode=$versionCode")
+
         if (PluginEntry.pref?.getBoolean("key_assistant_use_custom_directive", false) == true) {
             findAndHookMethod(
                 "a50", classLoader,
@@ -43,8 +50,12 @@ class AssistantHook : IXposedHookLoadPackage {
                         val bundle = param.args.first() as Bundle
 //                    log(bundle.toString())
 
-                        val actionStr =
-                            XposedHelpers.callMethod(param.thisObject, "N1", bundle) as String?
+                        val actionStr = XposedHelpers.callMethod(
+                            param.thisObject,
+                            if (versionCode >= 7442) "Q1"
+                            else "N1",
+                            bundle
+                        ) as String?
 
                         val matchCustomCommand =
                             actionStr?.let {
@@ -70,7 +81,8 @@ class AssistantHook : IXposedHookLoadPackage {
                     }
                 })
         }
-        if (BuildConfig.DEBUG) {
+
+        if (BuildConfig.DEBUG && false) {
             findAndHookMethod(
                 "com.lenovo.lasf.util.Log", classLoader,
                 "isLoggable",
@@ -83,38 +95,6 @@ class AssistantHook : IXposedHookLoadPackage {
                 }
             )
         }
-
-//        var textReceiver: BroadcastReceiver? = null
-//        val textReceiverAction = "com.chenyue404.motohook.assistant.text"
-//        findAndHookMethod(
-//            "is#", classLoader,
-//            "onAttachedToWindow",
-//            object : XC_MethodHook() {
-//                override fun afterHookedMethod(param: MethodHookParam) {
-//                    textReceiver = object : BroadcastReceiver() {
-//                        override fun onReceive(context: Context, intent: Intent) {
-//                            val str = intent.extras?.getString("text")
-//                            if (str.isNullOrEmpty()) {
-//                                log("空Str")
-//                                return
-//                            }
-//                            XposedHelpers.callMethod(param.thisObject, "n2", str)
-//                        }
-//                    }
-//                    AndroidAppHelper.currentApplication()
-//                        .registerReceiver(textReceiver, IntentFilter(textReceiverAction))
-//                }
-//            }
-//        )
-//        findAndHookMethod(
-//            "is#", classLoader,
-//            "onDetachedFromWindow",
-//            object : XC_MethodHook() {
-//                override fun afterHookedMethod(param: MethodHookParam) {
-//                    AndroidAppHelper.currentApplication().unregisterReceiver(textReceiver)
-//                }
-//            }
-//        )
     }
 
     private fun log(str: String) {
